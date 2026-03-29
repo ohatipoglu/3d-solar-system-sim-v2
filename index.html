@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3D Astronomi Simülasyonu - Dünya, Ay ve Güneş</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', 'Poppins', 'Arial', sans-serif;
+        }
+        /* HUD Paneli - Modern, yarı şeffaf */
+        .hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(10, 10, 20, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 12px 24px;
+            color: #f0f0f0;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            pointer-events: none;
+            z-index: 10;
+            font-size: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        .hud-left, .hud-right {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .hud-item {
+            background: rgba(0,0,0,0.5);
+            padding: 5px 12px;
+            border-radius: 40px;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+        }
+        .hud-item i {
+            font-style: normal;
+            font-weight: 600;
+            color: #ffaa66;
+        }
+        .controls-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 12px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+            border: 1px solid rgba(255,215,0,0.3);
+            pointer-events: auto;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+        }
+        button, .preset-btn, .scale-btn, .date-btn {
+            background: #1e2a3a;
+            border: none;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            font-size: 13px;
+        }
+        button:hover, .preset-btn:hover, .scale-btn:hover, .date-btn:hover {
+            background: #ffaa33;
+            color: #111;
+            transform: scale(1.02);
+        }
+        .active-speed {
+            background: #ffaa33;
+            color: #111;
+        }
+        input[type="range"] {
+            width: 180px;
+            cursor: pointer;
+            background: #2c3e44;
+            height: 3px;
+            border-radius: 5px;
+        }
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0a0f1a;
+            padding: 5px 12px;
+            border-radius: 40px;
+        }
+        .date-picker {
+            background: #0a0f1a;
+            border: 1px solid #ffaa33;
+            border-radius: 40px;
+            padding: 5px 12px;
+            color: white;
+            font-family: monospace;
+        }
+        .separator {
+            width: 1px;
+            height: 30px;
+            background: rgba(255,255,255,0.3);
+            margin: 0 6px;
+        }
+        @media (max-width: 800px) {
+            .hud { font-size: 10px; padding: 8px 12px; }
+            .controls-panel { flex-direction: column; align-items: stretch; gap: 8px; bottom: 10px; left: 10px; right: 10px; }
+            .speed-control { justify-content: space-between; }
+            button, .preset-btn { padding: 5px 10px; font-size: 11px; }
+        }
+        .kbd-hint {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-left: 5px;
+        }
+        .title {
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffcc44, #ff8844);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="hud">
+        <div class="hud-left">
+            <div class="hud-item">🌞 <span id="sim-date">--</span> <span style="font-size:11px;">(UTC)</span></div>
+            <div class="hud-item">🕌 <span id="sim-date-istanbul">--</span> (İstanbul)</div>
+            <div class="hud-item">🍂 <span id="season">--</span></div>
+            <div class="hud-item">🌙 <span id="moon-phase">--</span> <span id="moon-emoji">🌑</span></div>
+        </div>
+        <div class="hud-right">
+            <div class="hud-item">📏 Dünya-Güneş: <span id="sun-dist">--</span> milyon km</div>
+            <div class="hud-item">🌍 Dünya-Ay: <span id="moon-dist">--</span> bin km</div>
+            <div class="hud-item">⚡ Hız: <span id="speed-mult">1.00</span> x</div>
+            <div class="hud-item">⏱️ <span id="realtime-badge">Gerçek Zaman</span></div>
+        </div>
+    </div>
+
+    <div class="controls-panel">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button id="playPauseBtn">⏸️ Duraklat</button>
+            <button id="resetNowBtn">🔄 Şimdiki Zamana Dön</button>
+            <button id="rewindBtn">⏪ Geri Sar (1sn)</button>
+            <button id="forwardBtn">⏩ İleri Sar (1sn)</button>
+            <button id="toggleScaleBtn">🌐 Görsel Ölçek</button>
+            <button id="toggleGridBtn">📐 Ekliptik Izgara</button>
+        </div>
+        <div class="speed-control">
+            <span>🐢 Hız</span>
+            <input type="range" id="speedSlider" min="-2" max="6" step="0.01" value="0">
+            <span id="speedValue">1x</span>
+            <div class="separator"></div>
+            <div style="display: flex; gap: 5px;">
+                <button class="preset-btn" data-speed="0.1">0.1x</button>
+                <button class="preset-btn" data-speed="1">1x</button>
+                <button class="preset-btn" data-speed="10">10x</button>
+                <button class="preset-btn" data-speed="100">100x</button>
+                <button class="preset-btn" data-speed="1000">1000x</button>
+                <button class="preset-btn" data-speed="10000">10k x</button>
+                <button class="preset-btn" data-speed="100000">100k x</button>
+                <button class="preset-btn" data-speed="1000000">1M x</button>
+            </div>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <span>📅 Tarihe atla:</span>
+            <input type="date" id="datePicker" class="date-picker">
+            <button id="jumpToApollo" class="date-btn">🚀 Apollo 11 (20 Temmuz 1969)</button>
+            <button id="juneSolstice" class="date-btn">☀️ 21 Haziran 2025</button>
+            <div class="kbd-hint">⌨️ [Space] ⏯️ | [R] Reset | [C] Kamera | [1-9] Hız</div>
+        </div>
+    </div>
+
+    <!-- Three.js kütüphaneleri -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <!-- Simülasyonun ana giriş noktası -->
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
