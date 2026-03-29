@@ -1,119 +1,52 @@
 # 🌍 3D Astronomi Simülasyonu – Dünya, Ay ve Güneş
 
-Bu proje, Dünya'nın Güneş etrafındaki yörüngesini ve Ay'ın Dünya etrafındaki yörüngesini **gerçek zamanlı**, **3 boyutlu** ve **etkileşimli** olarak görselleştiren bir web tabanlı simülasyondur. Tamamen Three.js kütüphanesi ile geliştirilmiş olup, modern bir tarayıcıda ek bir kurulum gerektirmeden çalışır.
-
-![Simülasyon Ekran Görüntüsü](https://via.placeholder.com/800x400?text=3D+Astronomy+Simulation)
+Bu proje, Dünya'nın Güneş etrafındaki yörüngesini ve Ay'ın Dünya etrafındaki yörüngesini **gerçek zamanlı**, **3 boyutlu** ve **etkileşimli** olarak görselleştiren web tabanlı bir simülasyondur. ES6 modül yapısı ve Three.js (r128) kullanılarak geliştirilmiştir.
 
 ## 🚀 Özellikler
 
 ### Astronomik Doğruluk
-- Dünya'nın Güneş etrafındaki yıllık yörüngesi (gerçek hız ve dönem)
-- Ay'ın Dünya etrafındaki aylık yörüngesi (27.3 gün)
-- Dünya'nın 23.44° eksen eğikliği ile mevsimlerin oluşumu
-- Ay'ın tidal lock (eşzamanlı dönüş) efekti
-- Gerçek zamanlı Ay fazı hesaplaması
+* **Gerçekçi Periyotlar:** Dünya'nın yıllık yörüngesi ve Ay'ın 27.3 günlük yörünge döngüsü matematiksel olarak modellenmiştir.
+* **Fiziksel Detaylar:** Dünya'nın 23.44° eksen eğikliği ve buna bağlı mevsim değişimleri hesaplanmaktadır.
+* **Dinamik Veriler:** Vektörel açılar kullanılarak Ay'ın fazı (Yeni Ay, Dolunay, vb.) ve Dünya-Güneş/Ay mesafeleri anlık olarak hesaplanır.
 
 ### Görsel Kalite
-- Yüksek çözünürlüklü NASA dokuları (Dünya, Ay, bulutlar)
-- Dinamik gölgelendirme ve ışıklandırma (Güneş tek ışık kaynağı)
-- Bloom (parlama) efekti ve Güneş etrafında korona
-- Derin uzay yıldız alanı ve sarmal nebula efekti
-- Yarı saydam yörünge çizgileri (Dünya yörüngesi mavi, Ay yörüngesi altın sarısı)
+* **Gelişmiş Kaplamalar:** Yüksek çözünürlüklü diffuse, specular ve normal haritaları ile Dünya yüzeyi ve bulut katmanları.
+* **Post-Processing:** `UnrealBloomPass` kullanılarak Güneş çevresinde gerçekçi parlama (korona) efekti.
+* **Derin Uzay:** 4000 adet parçacıktan (particle) oluşan dinamik yıldız alanı.
 
-### Kullanıcı Kontrolleri
-- **Zaman kontrolü:** Oynat/Duraklat, geri sar, ileri sar, anlık zamana dön
-- **Hız ayarı:** 0.1x'ten 1.000.000x'e kadar kaydırıcı ve hazır butonlar
-- **Ölçek modları:** Görsel ölçek (estetik) / Gerçek fiziksel ölçek (doğru oranlar)
-- **Kamera kontrolü:** Fare ile orbit, zoom, pan
-- **Klavye kısayolları:** Space (oynat/duraklat), R (sıfırla), C (kamera hedefi), 1-9 (hız preset)
+### Etkileşimli Kontroller (HUD & UI)
+* **Zaman Yönetimi:** Simülasyonu duraklatma, ileri/geri sarma ve 0.1x ile 1.000.000x arasında logaritmik hız ayarı.
+* **Ölçeklendirme:** Göze hitap eden "Görsel Ölçek" ile mesafelerin doğru yansıtıldığı "Gerçek Ölçek" arasında geçiş.
+* **Kamera Hedefleri:** Yörünge kontrolleri (OrbitControls) ile kamerayı Serbest, Güneş, Dünya veya Ay'a kilitleme.
+* **Tarih Atlama:** İstenilen bir tarihe, Apollo 11 inişine (20 Temmuz 1969) veya yaz gündönümüne anında geçiş.
 
-### Bilgi Paneli (HUD)
-- Simüle edilen tarih ve saat (UTC ve İstanbul)
-- Mevsim ve Ay fazı (emoji + metin)
-- Dünya-Güneş mesafesi (AU ve km)
-- Dünya-Ay mesafesi (km)
-- Anlık simülasyon hızı
+## 📁 Proje Yapısı
 
-### Ekstra Özellikler
-- Tarihe atlama (takvim seçici veya özel tarihler: Apollo 11 inişi, 21 Haziran yaz gündönümü)
-- Zoom seviyesine göre otomatik detay modu (Güneş’e yaklaşınca korona, Dünya’ya yaklaşınca bulutlar ve atmosfer)
-- Ekliptik düzlem grid’ini açıp kapama
+Proje, temiz bir kod mimarisi için modüllere ayrılmıştır:
 
-## 📦 Gereksinimler
+* `index.html`: Ana arayüz, HUD ve kontrollerin bulunduğu giriş dosyası.
+* `src/main.js`: Three.js sahne kurulumu, render döngüsü ve animasyonların yönetildiği ana modül.
+* `src/celestial.js`: Güneş, Dünya, Ay ve bulut mesh'lerinin, materyallerinin ve kaplamalarının oluşturulduğu modül.
+* `src/constants.js`: Simülasyonda kullanılan astronomik ve matematiksel sabitler (AU, periyotlar, ölçekler).
+* `src/ui.js`: Kullanıcı arayüzü güncellemeleri, buton dinleyicileri ve klavye kısayollarının yönetimi.
+* `src/utils.js`: Ay fazı hesaplama ve mevsim belirleme gibi yardımcı matematiksel fonksiyonlar.
 
-- Modern bir web tarayıcısı (Chrome, Firefox, Edge, Safari)
-- İnternet bağlantısı (dokular ve kütüphaneler CDN üzerinden yüklenir)
-- WebGL desteği (neredeyse tüm modern cihazlarda mevcuttur)
+## 🖥️ Nasıl Çalıştırılır?
 
-## 🖥️ Nasıl Çalıştırılır
+Proje ES6 modülleri (`type="module"`) kullandığı için, güvenlik (CORS) politikaları gereği dosyayı tarayıcıda doğrudan çift tıklayarak (`file://`) açtığınızda kaplamalar yüklenmeyebilir. 
 
-1. **Tek dosya:** Proje `index.html` adlı tek bir dosyadan oluşur.
-2. Dosyayı bilgisayarınıza indirin.
-3. Herhangi bir web tarayıcısında dosyayı çift tıklayarak açın.
-   > Not: Bazı tarayıcılar yerel dosyalarda WebGL kısıtlaması uygulayabilir. Bu durumda basit bir HTTP sunucusu kullanabilirsiniz:
-   > ```bash
-   > # Python ile
-   > python -m http.server 8000
-   > # veya
-   > npx serve
-   > ```
-4. Simülasyon otomatik olarak başlayacaktır.
+Sorunsuz çalıştırmak için yerel bir web sunucusu kullanmalısınız:
 
-## 🎮 Kullanım Kılavuzu
+**Seçenek 1: VS Code (Önerilen)**
+1. Projeyi VS Code ile açın.
+2. `Live Server` eklentisini kurun.
+3. `index.html` dosyasına sağ tıklayıp "Open with Live Server" seçeneğine tıklayın.
 
-### Temel Kontroller
-| Eylem | Fare / Dokunmatik | Klavye |
-|-------|------------------|--------|
-| Döndürme | Sol tık + sürükle | - |
-| Yakınlaştır / Uzaklaştır | Sağ tık + sürükle veya kaydırma | - |
-| Kaydırma (pan) | Orta tık + sürükle | - |
-| Oynat / Duraklat | - | `Space` |
-| Şimdiki zamana dön | - | `R` |
-| Kamera hedefi (Güneş/Dünya/Ay/Serbest) | - | `C` |
-| Hız presetleri | - | `1` (0.1x) … `9` (10M x) |
+**Seçenek 2: Python / Node.js**
+Terminalinizi proje dizininde açıp aşağıdaki komutlardan birini çalıştırın:
+```bash
+# Python 3 için
+python -m http.server 8000
 
-### Alt Panel Butonları
-- **⏸️ Duraklat / ▶️ Başlat** : Simülasyon zamanını durdurur veya devam ettirir.
-- **🔄 Şimdiki Zamana Dön** : Simülasyonu gerçek ana sıfırlar.
-- **⏪ Geri Sar (1sn)** : Simülasyon zamanını 1 saniye geri alır.
-- **⏩ İleri Sar (1sn)** : Simülasyon zamanını 1 saniye ileri alır.
-- **🌐 Görsel Ölçek / ⚛️ Gerçek Ölçek** : Cisim boyutlarını ve yörünge mesafelerini değiştirir.
-- **📐 Ekliptik Izgara** : Yörünge düzlemindeki referans grid’ini gösterir/kapatır.
-
-### Hız Ayarları
-- **Kaydırıcı** ile logaritmik olarak 0.1x ile 1.000.000x arası hassas ayar.
-- **Preset butonlar** ile sık kullanılan hızlara tek tıkla geçiş.
-
-### Tarih Atlama
-- Takvim seçiciden herhangi bir tarih seçip "Enter" yaparak atlayabilirsiniz.
-- Özel butonlar ile Apollo 11 iniş anına veya 21 Haziran 2025 yaz gündönümüne ışınlanabilirsiniz.
-
-## 🛠️ Teknik Detaylar
-
-- **3D Motor:** Three.js (r128)
-- **Post-processing:** EffectComposer + UnrealBloomPass
-- **Gölgelendirme:** PointLight (Güneş) + ShadowMap
-- **Dokular:** NASA'nın Blue Marble ve Ay yüzeyi dokuları (üçüncü parti CDN'lerden yüklenir)
-- **Zaman Yönetimi:** Gerçek Unix timestamp tabanlı, astronomik periyotlar saniye cinsinden modellenmiştir.
-- **Yörünge Mekaniği:** Kepler yasaları basitleştirilmiş (dairesel yörüngeler, sabit hız). Eksantriklik ve pertürbasyonlar göz ardı edilmiştir (görsel simülasyon için yeterlidir).
-
-## 🌟 Gelecek Geliştirmeler
-
-- [ ] Gezegenler (Merkür, Venüs, Mars, Jüpiter, Satürn) eklenmesi
-- [ ] Tutulma simülasyonları (Güneş ve Ay tutulmaları)
-- [ ] Gerçek yıldız haritası (HIP kataloğu) ile arka plan
-- [ ] Mobil cihazlar için dokunmatik iyileştirmeleri
-- [ ] Sesli anlatım ve eğitici mod
-
-## 📜 Lisans
-
-Bu proje MIT lisansı ile lisanslanmıştır. Kullanım, kopyalama, değiştirme ve dağıtım serbesttir. Katkıda bulunmak isterseniz lütfen iletişime geçin.
-
-## 👨‍💻 Katkıda Bulunanlar
-
-- Tasarım ve geliştirme: [Simülasyon Uzmanı - AI asistanı]
-- Three.js topluluğu ve NASA dokuları için teşekkürler.
-
----
-
-**İyi seyirler!** 🚀🌕🌞
+# Node.js için
+npx serve
